@@ -26,7 +26,7 @@ float* xcoords;
 float* ycoords;
 
 float xmin = -2.0;
-nfloat xmax = 1.0;
+float xmax = 1.0;
 float ymin = -1.5;
 float ymax = 1.5;
 
@@ -48,10 +48,10 @@ int iterations_for_zoom(float initial_width, float current_width)
     float zoom = initial_width / current_width;
     if (zoom < 1.0f) zoom = 1.0f;
 
-    float level = log10f(zoom);
+    float level = log10f(zoom)*2;
     if (level < 0.0f) level = 0.0f;
 
-    float base  = 150.0f;
+    float base  = 50.0f;
     float scale = 80.0f;
 
     float it = base + scale * powf(level, 1.5f);
