@@ -22,13 +22,13 @@ unsigned int termHeight();
 struct winsize win;
 
 
-float* xcoords;
-float* ycoords;
+double* xcoords;
+double* ycoords;
 
-float xmin = -2.0;
-nfloat xmax = 1.0;
-float ymin = -1.5;
-float ymax = 1.5;
+double xmin = -2.0;
+double xmax = 1.0;
+double ymin = -1.5;
+double ymax = 1.5;
 
 int width = 900;
 int height = 400;
@@ -43,20 +43,20 @@ void setCursorPosition(int x, int y) {
 	printf("\033[%d;%dH", y+1, x+1);
 }
 
-int iterations_for_zoom(float initial_width, float current_width)
+int iterations_for_zoom(double initial_width, double current_width)
 {
-    float zoom = initial_width / current_width;
-    if (zoom < 1.0f) zoom = 1.0f;
+    double zoom = initial_width / current_width;
+    if (zoom < 1.0) zoom = 1.0;
 
-    float level = log10f(zoom);
-    if (level < 0.0f) level = 0.0f;
+    double level = log10(zoom);
+    if (level < 0.0) level = 0.0;
 
-    float base  = 150.0f;
-    float scale = 80.0f;
+    double base  = 150.0;
+    double scale = 80.0;
 
-    float it = base + scale * powf(level, 1.5f);
+    double it = base + scale * powf(level, 1.5);
 
-    if (it > 2000000.0f) it = 2000000.0f;
+    if (it > 2000000.0) it = 2000000.0;
 
     return (int)it;
 }
@@ -64,32 +64,32 @@ int iterations_for_zoom(float initial_width, float current_width)
 struct pixel render_pixel(int px, int py)
 {
 
-	float x0 = xcoords[px] * (xmax - xmin) + xmin;
-	float y0 = ycoords[py] * (ymax - ymin) + ymin;
+	double x0 = xcoords[px] * (xmax - xmin) + xmin;
+	double y0 = ycoords[py] * (ymax - ymin) + ymin;
 
-	float x = 0;
-	float y = 0;
+	double x = 0;
+	double y = 0;
 				
 	int iteration = 0;
 	int max_iteration = iterations_for_zoom(3,xmax-xmin);
 	while(x*x + y*y < 4 && iteration < max_iteration){
-		float xtemp = x*x - y*y + x0;
+		double xtemp = x*x - y*y + x0;
 		y = 2*x*y + y0;
 		x = xtemp;
 		iteration++;
 	}
 
 
-	float t = (float)iteration / (float)max_iteration;
-	float it = 1.0f - t;
-	float it2 = it*it;
-	float it3 = it2*it;
-	float t2 = t*t;
-	// float t3 = t2*t; // if needed
+	double t = (double)iteration / (double)max_iteration;
+	double it = 1.0 - t;
+	double it2 = it*it;
+	double it3 = it2*it;
+	double t2 = t*t;
+	// double t3 = t2*t; // if needed
 
-	float r = 255.0f * (1.0f - it3);
-	float g = 255.0f * t2;
-	float b = 40.0f  * t;
+	double r = 255.0* (1.0 - it3);
+	double g = 255.0 * t2;
+	double b = 40.0  * t;
 
 	struct pixel pixel;
 	pixel.r = r;
@@ -167,14 +167,14 @@ int main() {
 	width = termWidth()-2;
 	height = termHeight()-2;
 	
-	xcoords = malloc(width * sizeof(float));
-	ycoords = malloc(height * sizeof(float));
+	xcoords = malloc(width * sizeof(double));
+	ycoords = malloc(height * sizeof(double));
 
 	for (int px = 0; px < width; px++)
-    xcoords[px] = (px / (float)width);
+    xcoords[px] = (px / (double)width);
 
 	for (int py = 0; py < height; py++)
-    ycoords[py] = (py / (float)height);
+    ycoords[py] = (py / (double)height);
 
 	
 	while(1){
@@ -183,11 +183,11 @@ int main() {
 		//		usleep(10000);
 		if(kbhit() == 1){
 			char key = getchar();
-			float xRange = xmax - xmin;
-			float yRange = ymax - ymin;
+			double xRange = xmax - xmin;
+			double yRange = ymax - ymin;
 
 			// Zoom factor (percentage of the range)
-			float zoomFactor = 0.1;  // 10% zoom in/out
+			double zoomFactor = 0.1;  // 10% zoom in/out
 
 			if(key == '+' || key == '='){
 				xmin += xRange * zoomFactor;
@@ -203,7 +203,7 @@ int main() {
 			}
 
 			// Pan factor (percentage of the range)
-			float panFactor = 0.1;  // 10% of current range
+			double panFactor = 0.1;  // 10% of current range
 
 			if(key == 'a'){ // left
 				xmin -= xRange * panFactor;
